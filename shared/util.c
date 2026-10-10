@@ -486,9 +486,31 @@ int sleep_until_msec(unsigned long long msec)
 {
 	struct timespec ts = msec_ts(msec);
 
+#ifdef __APPLE__
+	struct timespec now;
+
+	if (clock_gettime(CLOCK_MONOTONIC, &now) < 0)
+		return -errno;
+
+	if (ts.tv_sec < now.tv_sec ||
+	    (ts.tv_sec == now.tv_sec && ts.tv_nsec <= now.tv_nsec))
+		return 0;
+
+	/* nanosleep takes a relative interval rather than an absolute deadline. */
+	ts.tv_sec -= now.tv_sec;
+	ts.tv_nsec -= now.tv_nsec;
+	if (ts.tv_nsec < 0) {
+		ts.tv_sec--;
+		ts.tv_nsec += 1000000000L;
+	}
+
+	if (nanosleep(&ts, NULL) < 0 && errno != EINTR)
+		return -errno;
+#else
 	if (clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, NULL) < 0 &&
 	    errno != EINTR)
 		return -errno;
+#endif
 
 	return 0;
 }
