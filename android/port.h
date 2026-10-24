@@ -28,18 +28,19 @@
 
 #define _GNU_SOURCE
 
-#include <endian.h>
-
 #if defined(__APPLE__)
 
-#include <endian-darwin.h>
-#define HAVE_DECL_STRNDUPA
+#include <libkern/OSByteOrder.h>
+#define be32toh(value) OSSwapBigToHostInt32(value)
+#define HAVE_DECL_STRNDUPA 1
 #define strndupa(_s,_l)        strdup(_s)
 char* basename(const char*);
 #define init_module     darwin_init_module
 #define delete_module   darwin_delete_module
 #define program_invocation_short_name "depmod"
 
+#else
+#include <endian.h>
 #endif
 
 #if defined(__ANDROID__) || defined(__APPLE__)
