@@ -44,6 +44,7 @@ char* basename(const char*);
 #endif
 
 #if defined(__ANDROID__) || defined(__APPLE__)
+#include <limits.h>
 #include <stdlib.h>
 #include <unistd.h>
 static inline char *get_current_dir_name(void) {

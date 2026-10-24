@@ -562,7 +562,9 @@ unsigned long long now_msec(void)
 
 unsigned long long stat_mstamp(const struct stat *st)
 {
-#ifdef HAVE_STRUCT_STAT_ST_MTIM
+#if defined(__APPLE__)
+	return ts_usec(&st->st_mtimespec);
+#elif defined(HAVE_STRUCT_STAT_ST_MTIM)
 	return ts_usec(&st->st_mtim);
 #else
 	return (unsigned long long) st->st_mtime;

@@ -58,6 +58,9 @@ cc_defaults {
         "-UNDEBUG",
     ],
     target: {
+        darwin: {
+            include_dirs: ["external/elfutils/libelf"],
+        },
         glibc: {
             cflags: ["-DHAVE_DECL_STRNDUPA"],
         },
